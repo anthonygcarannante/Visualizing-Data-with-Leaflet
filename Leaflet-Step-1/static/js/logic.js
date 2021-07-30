@@ -8,7 +8,7 @@ function markerStyler(magnitude, depth) {
     color: markerColor(depth),
     fillColor: markerColor(depth),
     fillOpacity: 0.75
-  }  
+  }
   return markerRadius
 }
 
@@ -42,12 +42,12 @@ function createFeatures(earthquakeData) {
   // Iterate via geoJson function to create popup on click
   // Iterate to create markers from functions defined above for depth and magnitude
   var earthquakes = L.geoJSON(earthquakeData, {
+    pointToLayer: function (feature, latlng) {
+      return L.circleMarker(latlng, markerStyler(feature.properties.mag, feature.geometry.coordinates[2]))
+    },
     onEachfeature: function (feature, layer) {
       console.log(feature.properties.place)
-        layer.bindPopup(`Magnitude: ${feature.geometry.coordinates[2]}<br>Location: ${feature.properties.place}`)
-       },
-    pointToLayer: function (feature, latlng) {
-      return L.circleMarker(latlng, markerStyler(feature.properties.mag,feature.geometry.coordinates[2]))
+      layer.bindPopup(`Magnitude: ${feature.geometry.coordinates[2]}<br>Location: ${feature.properties.place}`)
     }
   });
 
@@ -96,15 +96,31 @@ function createMap(earthquakes) {
   }).addTo(myMap);
 
   var legend = L.control({
-    position: "bottomleft"
+    position: "bottomright"
   });
-  
-  // legend.onAdd = function(map) {
-  //   var div = L.DomUtil.create("div", "info legend");
-  //   labels = [`<strong>Categories</strong>`],
-  //   categories = ["Depth > 65", "Depth > 45", "Depth > 25", "Depth > 10", "Depth > 0"]
-  // }
 
-  // legend.addTo(myMap);
+  legend.onAdd = function () {
+    var div = L.DomUtil.create("div", "info legend");
+
+    var depth_scale = [0, 10, 25, 45, 65];
+    var colors = [
+      "#98ee00",
+      "#d4ee00",
+      "#eecc00",
+      "#ee9c00",
+      "#ea822c",
+      "#ea2c2c"
+    ];
+
+    for (var i = 0; i < depth_scale.length; i++) {
+        div.innerHTML +=
+          "<i style='background: " + colors[i] + "'></i> " +
+          depth_scale[i] + (depth_scale[i + 1] ? "&ndash;" + depth_scale[i + 1] + "<br>" : "+");
+      }
+    return div;
+  }
+  legend.addTo(myMap);
 
 }
+
+
