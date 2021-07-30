@@ -39,16 +39,19 @@ d3.json(link).then(function (data) {
 
 function createFeatures(earthquakeData) {
 
+  // Iterate via geoJson function to create popup on click
+  // Iterate to create markers from functions defined above for depth and magnitude
   var earthquakes = L.geoJSON(earthquakeData, {
     onEachfeature: function (feature, layer) {
-      layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p> ${new Date(feature.properties.time)}</p>`)
-    },
+      console.log(feature.properties.place)
+        layer.bindPopup(`Magnitude: ${feature.geometry.coordinates[2]}<br>Location: ${feature.properties.place}`)
+       },
     pointToLayer: function (feature, latlng) {
-      console.log(feature.geometry.coordinates[2])
       return L.circleMarker(latlng, markerStyler(feature.properties.mag,feature.geometry.coordinates[2]))
     }
   });
 
+  // Call function to create map with earthquakes data
   createMap(earthquakes);
 };
 
@@ -91,5 +94,17 @@ function createMap(earthquakes) {
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   }).addTo(myMap);
+
+  var legend = L.control({
+    position: "bottomleft"
+  });
+  
+  // legend.onAdd = function(map) {
+  //   var div = L.DomUtil.create("div", "info legend");
+  //   labels = [`<strong>Categories</strong>`],
+  //   categories = ["Depth > 65", "Depth > 45", "Depth > 25", "Depth > 10", "Depth > 0"]
+  // }
+
+  // legend.addTo(myMap);
 
 }
