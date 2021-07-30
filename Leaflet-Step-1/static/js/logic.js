@@ -15,18 +15,18 @@ function markerStyler(magnitude, depth) {
 // Function for marker colors based on depth
 function markerColor(depth) {
   switch (true) {
-    case depth > 65:
-      return "#cc0000";
-    case depth > 45:
-      return "##e60000";
-    case depth > 25:
-      return "#ff0000";
+    case depth > 90:
+      return "red";
+    case depth > 70:
+      return "orangered";
+    case depth > 50:
+      return "orange";
+    case depth > 30:
+      return "gold";
     case depth > 10:
-      return "#ff1a1a";
-    case depth > 0:
-      return "#ff3333";
+      return "yellow";
     default:
-      return "#ff3333";
+      return "lightgreen";
   }
 }
 
@@ -45,9 +45,8 @@ function createFeatures(earthquakeData) {
     pointToLayer: function (feature, latlng) {
       return L.circleMarker(latlng, markerStyler(feature.properties.mag, feature.geometry.coordinates[2]))
     },
-    onEachfeature: function (feature, layer) {
-      console.log(feature.properties.place)
-      layer.bindPopup(`Magnitude: ${feature.geometry.coordinates[2]}<br>Location: ${feature.properties.place}`)
+    onEachFeature: function(feature, layer) {
+      layer.bindPopup(`Location: ${feature.properties.place}<br>Magnitude ${feature.properties.mag}<br>Depth: ${feature.geometry.coordinates[2]}`)
     }
   });
 
@@ -102,25 +101,18 @@ function createMap(earthquakes) {
   legend.onAdd = function () {
     var div = L.DomUtil.create("div", "info legend");
 
-    var depth_scale = [0, 10, 25, 45, 65];
-    var colors = [
-      "#98ee00",
-      "#d4ee00",
-      "#eecc00",
-      "#ee9c00",
-      "#ea822c",
-      "#ea2c2c"
-    ];
+    var depth = [10, 30, 50, 70, 90];
 
-    for (var i = 0; i < depth_scale.length; i++) {
-        div.innerHTML +=
-          "<i style='background: " + colors[i] + "'></i> " +
-          depth_scale[i] + (depth_scale[i + 1] ? "&ndash;" + depth_scale[i + 1] + "<br>" : "+");
-      }
+    div.innerHTML += "<h4 style='text-align: center'>Depth</h4>"
+    for (var i = 0; i < depth.length; i++) {
+      div.innerHTML +=
+      '<i style="background: ' + markerColor(depth[i] + 1) + '"></i> ' +
+      depth[i] + (depth[i + 1] ? '&ndash;' + depth[i + 1] + '<br>' : '+');
+      console.log(markerColor(depth[i]+1));
+    }
     return div;
   }
+
   legend.addTo(myMap);
 
 }
-
-
